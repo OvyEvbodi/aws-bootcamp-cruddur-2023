@@ -1,0 +1,56 @@
+# creates a budget and adds an email subription
+#instructions for creating this budget via the cli
+# validate this file. replace file path
+# aws cloudformation validate-template --template-body <FILEPATH>
+# run the following command to create the stack. Replace stack name and file path
+# aws cloudformation create-stack --stack-name <STACK-NAME> --template-body <FILEPATH>
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Basic Budget test with cloud formation"
+
+# Variables for the budget to be created
+# email to be notified
+# budget amount
+Parameters:
+  EmailAdd:
+    Type: String
+    Default: cloudplayer686@gmail.com
+  BudgetAmt:
+    Type: Number
+    Default: 1
+
+Resources:
+  CruddurCFBudget:
+    Type: "AWS::Budgets::Budget"
+    Properties:
+      Budget:
+        BudgetLimit:
+          Amount: !Sub ${BudgetAmt}
+          Unit: USD
+        TimeUnit: MONTHLY
+        TimePeriod:
+          Start: 1706742000
+          End: 1709247600
+        BudgetType: COST
+        CostTypes:
+          IncludeCredit: true
+          IncludeDiscount: true
+          IncludeOtherSubscription: true
+          IncludeRecurring: true
+          IncludeRefund: true
+          IncludeSubscription: true
+          IncludeSupport: true
+          IncludeTax: true
+          IncludeUpfront: true
+          UseBlended: false
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 80
+          Subscribers:
+          - SubscriptionType: EMAIL
+            Address: !Sub ${EmailAdd}
+Outputs:
+  BudgetId:
+    Value: !Ref CruddurCFBudget
